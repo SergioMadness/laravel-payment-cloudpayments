@@ -1,0 +1,51 @@
+{
+  "name": "professionalweb/laravel-payment-cloudpayments",
+  "description": "Driver for cloudpayments.ru",
+  "homepage": "http://web-development.pw/",
+  "keywords": [
+    "pwf",
+    "professional web",
+    "web-development.pw",
+    "composer",
+    "payment system",
+    "cloudpayments.ru",
+    "laravel"
+  ],
+  "minimum-stability": "stable",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Zinchenko Sergey",
+      "email": "zinchenko@web-development.pw"
+    }
+  ],
+  "support": {
+    "email": "info@web-development.pw",
+    "issues": "https://github.com/SergioMadness/payment-laravel-cloudpayments/issues",
+    "wiki": "https://github.com/SergioMadness/payment-laravel-cloudpayments/wiki",
+    "source": "https://github.com/SergioMadness/payment-laravel-cloudpayments/releases"
+  },
+  "require": {
+    "illuminate/support": "5.*",
+    "professionalweb/payment-laravel": "3.1.x-dev",
+    "troytft/cloud-payments-client": "^0.1.0"
+  },
+  "require-dev": {
+  },
+  "config": {
+    "process-timeout": 1800
+  },
+  "autoload": {
+    "psr-4": {
+      "professionalweb\\payment\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "professionalweb\\payment\\CloudPaymentsProvider"
+      ]
+    }
+  }
+}
