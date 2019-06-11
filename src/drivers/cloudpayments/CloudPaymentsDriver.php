@@ -1,15 +1,33 @@
 <?php namespace professionalweb\payment\drivers\cloudpayments;
 
+use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
 use professionalweb\payment\contracts\Form;
 use professionalweb\payment\contracts\Receipt;
 use professionalweb\payment\contracts\PayService;
 use professionalweb\payment\contracts\PayProtocol;
+use professionalweb\payment\models\PayServiceOption;
 use professionalweb\payment\interfaces\CloudPaymentsService;
 use professionalweb\payment\contracts\recurring\RecurringSchedule;
 
+/**
+ * CloudPayments implementation
+ * @package professionalweb\payment\drivers\cloudpayments
+ */
 class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringSchedule
 {
+
+    /**
+     * @var PayProtocol
+     */
+    private $transport;
+
+    /**
+     * Notification info
+     *
+     * @var array
+     */
+    protected $response;
 
     /**
      * Get name of payment service
@@ -36,6 +54,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      * @param Receipt $receipt
      *
      * @return string
+     * @throws \Exception
      */
     public function getPaymentLink($orderId,
                                    $paymentId,
@@ -48,7 +67,25 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
                                    array $extraParams = [],
                                    Receipt $receipt = null): string
     {
-        // TODO: Implement getPaymentLink() method.
+        if (!isset($extraParams['checkout'], $extraParams['cardholder_name'])) {
+            throw new \Exception('checkout and cardholder_name params are required');
+        }
+
+        $request = [
+            'Amount'               => $amount,
+            'Currency'             => $currency,
+            'InvoiceId'            => $orderId,
+            'Description'          => $description,
+            'AccountId'            => $this->getAccountId(),
+            'Name'                 => $extraParams['cardholder_name'],
+            'CardCryptogramPacket' => $extraParams['checkout'],
+            'IpAddress'            => $extraParams['ip'] ?? ($_SERVER['HTTP_CLIENT_IP'] ?? ''),
+            'JsonData'             => array_merge($extraParams, ['PaymentId' => $paymentId]),
+        ];
+
+        $paymentUrl = $this->getTransport()->getPaymentUrl($request);
+
+        return $paymentUrl;
     }
 
     /**
@@ -59,7 +96,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function needForm(): bool
     {
-        // TODO: Implement needForm() method.
+        return false;
     }
 
     /**
@@ -89,7 +126,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
                                    array $extraParams = [],
                                    Receipt $receipt = null): Form
     {
-        // TODO: Implement getPaymentForm() method.
+        return new Form();
     }
 
     /**
@@ -101,7 +138,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function validate(array $data): bool
     {
-        // TODO: Implement validate() method.
+        return true;
     }
 
     /**
@@ -113,7 +150,22 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setResponse(array $data): PayService
     {
-        // TODO: Implement setResponse() method.
+        $this->response = $data;
+
+        return $this;
+    }
+
+    /**
+     * Get response param by name
+     *
+     * @param string $name
+     * @param string $default
+     *
+     * @return mixed|string
+     */
+    public function getResponseParam(string $name, $default = '')
+    {
+        return Arr::get($this->response, $name, $default);
     }
 
     /**
@@ -123,7 +175,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getOrderId(): string
     {
-        // TODO: Implement getOrderId() method.
+        return $this->getResponseParam('Model.InvoiceId');
     }
 
     /**
@@ -133,7 +185,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPaymentId(): string
     {
-        // TODO: Implement getPaymentId() method.
+        return $this->getResponseParam('Model.JsonData.PaymentId');
     }
 
     /**
@@ -143,7 +195,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getStatus(): string
     {
-        // TODO: Implement getStatus() method.
+        return $this->getResponseParam('Model.Status');
     }
 
     /**
@@ -153,7 +205,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function isSuccess(): bool
     {
-        // TODO: Implement isSuccess() method.
+        return $this->getResponseParam('Success', false);
     }
 
     /**
@@ -163,7 +215,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getTransactionId(): string
     {
-        // TODO: Implement getTransactionId() method.
+        return $this->getResponseParam('Model.TransactionId');
     }
 
     /**
@@ -173,7 +225,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getAmount(): float
     {
-        // TODO: Implement getAmount() method.
+        return $this->getResponseParam('Model.Amount');
     }
 
     /**
@@ -183,7 +235,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getErrorCode(): string
     {
-        // TODO: Implement getErrorCode() method.
+        return $this->getResponseParam('Model.Message');
     }
 
     /**
@@ -193,7 +245,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getProvider(): string
     {
-        // TODO: Implement getProvider() method.
+        return self::PAYMENT_TYPE_CARD;
     }
 
     /**
@@ -203,7 +255,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPan(): string
     {
-        // TODO: Implement getPan() method.
+        return $this->getResponseParam('Model.CardFirstSix') . '******' . $this->getResponseParam('Model.CardLastFour');
     }
 
     /**
@@ -213,7 +265,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getDateTime(): string
     {
-        // TODO: Implement getDateTime() method.
+        return $this->getResponseParam('Model.CreatedDateIso');
     }
 
     /**
@@ -225,7 +277,19 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setTransport(PayProtocol $protocol): PayService
     {
-        // TODO: Implement setTransport() method.
+        $this->transport = $protocol;
+
+        return $this;
+    }
+
+    /**
+     * Get transport
+     *
+     * @return PayProtocol
+     */
+    public function getTransport(): PayProtocol
+    {
+        return $this->transport;
     }
 
     /**
@@ -237,7 +301,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getNotificationResponse(int $errorCode = null): Response
     {
-        // TODO: Implement getNotificationResponse() method.
+        return response($this->getTransport()->getNotificationResponse($this->response, $errorCode));
     }
 
     /**
@@ -249,7 +313,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCheckResponse(int $errorCode = null): Response
     {
-        // TODO: Implement getCheckResponse() method.
+        return response($this->getTransport()->getNotificationResponse($this->response, $errorCode));
     }
 
     /**
@@ -259,7 +323,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getLastError(): int
     {
-        // TODO: Implement getLastError() method.
+        return 0;
     }
 
     /**
@@ -271,7 +335,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getParam(string $name)
     {
-        // TODO: Implement getParam() method.
+        return $this->getResponseParam($name);
     }
 
     /**
@@ -281,7 +345,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getOptions(): array
     {
-        // TODO: Implement getOptions() method.
+        return [
+            (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Merchant Id')->setAlias('merchantId'),
+            (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Secret key')->setAlias('secretKey'),
+        ];
     }
 
     /**
@@ -309,7 +376,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     }
 
     /**
-     * Set user's e-mail
+     * Set user's e - mail
      *
      * @param string $email
      *
@@ -533,4 +600,6 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     {
         // TODO: Implement isActive() method.
     }
+
+
 }
