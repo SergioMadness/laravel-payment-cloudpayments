@@ -9,14 +9,16 @@ use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\models\PayServiceOption;
 use professionalweb\payment\interfaces\CloudPaymentsService;
 use professionalweb\payment\contracts\recurring\RecurringSchedule;
+use professionalweb\payment\contracts\recurring\RecurringPaymentSchedule;
 
 /**
  * CloudPayments implementation
  * @package professionalweb\payment\drivers\cloudpayments
  */
-class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringSchedule
+class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringSchedule, RecurringPaymentSchedule
 {
 
+    //<editor-fold desc="Fields">
     /**
      * @var PayProtocol
      */
@@ -28,6 +30,62 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      * @var array
      */
     protected $response;
+
+    /**
+     * @var string
+     */
+    private $paymentToken;
+
+    /**
+     * @var string
+     */
+    private $accountId;
+
+    /**
+     * @var string
+     */
+    private $description;
+
+    /**
+     * @var string
+     */
+    private $email;
+
+    /**
+     * @var float
+     */
+    private $amount;
+
+    /**
+     * @var string
+     */
+    private $currency;
+
+    /**
+     * @var bool
+     */
+    private $needConfirmation;
+
+    /**
+     * @var string
+     */
+    private $interval;
+
+    /**
+     * @var int
+     */
+    private $period;
+
+    /**
+     * @var string
+     */
+    private $startDate;
+
+    /**
+     * @var bool
+     */
+    private $isActive;
+    //</editor-fold>
 
     /**
      * Get name of payment service
@@ -72,6 +130,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
         }
 
         $request = [
+            'Email'                => $extraParams['email'] ?? null,
             'Amount'               => $amount,
             'Currency'             => $currency,
             'InvoiceId'            => $orderId,
@@ -346,7 +405,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     public function getOptions(): array
     {
         return [
-            (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Merchant Id')->setAlias('merchantId'),
+            (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Public Id')->setAlias('publicId'),
             (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Secret key')->setAlias('secretKey'),
         ];
     }
@@ -360,7 +419,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setToken(string $token): RecurringSchedule
     {
-        // TODO: Implement setToken() method.
+        $this->paymentToken = $token;
+
+        return $this;
     }
 
     /**
@@ -372,7 +433,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setDescription(string $description): RecurringSchedule
     {
-        // TODO: Implement setDescription() method.
+        $this->description = $description;
+
+        return $this;
     }
 
     /**
@@ -384,7 +447,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setEmail(string $email): RecurringSchedule
     {
-        // TODO: Implement setEmail() method.
+        $this->email = $email;
+
+        return $this;
     }
 
     /**
@@ -396,7 +461,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setAmount(float $amount): RecurringSchedule
     {
-        // TODO: Implement setAmount() method.
+        $this->amount = $amount;
+
+        return $this;
     }
 
     /**
@@ -408,7 +475,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setCurrency(string $currency): RecurringSchedule
     {
-        // TODO: Implement setCurrency() method.
+        $this->currency = $currency;
+
+        return $this;
     }
 
     /**
@@ -420,7 +489,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setAccountId(string $id): RecurringSchedule
     {
-        // TODO: Implement setAccountId() method.
+        $this->accountId = $id;
+
+        return $this;
     }
 
     /**
@@ -432,7 +503,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function needConfirmation(bool $flag = true): RecurringSchedule
     {
-        // TODO: Implement needConfirmation() method.
+        $this->needConfirmation = $flag;
+
+        return $this;
     }
 
     /**
@@ -444,7 +517,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setStartDate(string $startDate): RecurringSchedule
     {
-        // TODO: Implement setStartDate() method.
+        $this->startDate = $startDate;
+
+        return $this;
     }
 
     /**
@@ -456,7 +531,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setMaxPayments(int $qty): RecurringSchedule
     {
-        // TODO: Implement setMaxPayments() method.
+        $this->paymentQty = $qty;
+
+        return $this;
     }
 
     /**
@@ -466,7 +543,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function daily(): RecurringSchedule
     {
-        // TODO: Implement daily() method.
+        $this->period = 1;
+        $this->interval = 'Day';
+
+        return $this;
     }
 
     /**
@@ -476,7 +556,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function weekly(): RecurringSchedule
     {
-        // TODO: Implement weekly() method.
+        $this->period = 1;
+        $this->interval = 'Week';
+
+        return $this;
     }
 
     /**
@@ -486,7 +569,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function monthly(): RecurringSchedule
     {
-        // TODO: Implement monthly() method.
+        $this->period = 1;
+        $this->interval = 'Month';
+
+        return $this;
     }
 
     /**
@@ -496,7 +582,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function yearly(): RecurringSchedule
     {
-        // TODO: Implement yearly() method.
+        $this->period = 12;
+        $this->interval = 'Month';
+
+        return $this;
     }
 
     /**
@@ -508,7 +597,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function every(int $days): RecurringSchedule
     {
-        // TODO: Implement every() method.
+        $this->period = $days;
+        $this->interval = 'Day';
+
+        return $this;
     }
 
     /**
@@ -518,7 +610,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getId(): string
     {
-        // TODO: Implement getId() method.
+
     }
 
     /**
@@ -528,7 +620,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getAccountId(): string
     {
-        // TODO: Implement getAccountId() method.
+        return $this->accountId;
     }
 
     /**
@@ -538,7 +630,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getDescription(): string
     {
-        // TODO: Implement getDescription() method.
+        return $this->description;
     }
 
     /**
@@ -548,7 +640,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getEmail(): string
     {
-        // TODO: Implement getEmail() method.
+        return $this->email;
     }
 
     /**
@@ -558,7 +650,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCurrency(): string
     {
-        // TODO: Implement getCurrency() method.
+        return $this->currency;
     }
 
     /**
@@ -568,7 +660,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function isNeedConfirmation(): bool
     {
-        // TODO: Implement isNeedConfirmation() method.
+        return $this->needConfirmation;
     }
 
     /**
@@ -578,7 +670,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getStartDate(): string
     {
-        // TODO: Implement getStartDate() method.
+        return $this->startDate;
     }
 
     /**
@@ -588,7 +680,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getInterval(): string
     {
-        // TODO: Implement getInterval() method.
+        return $this->period . ' ' . $this->interval;
     }
 
     /**
@@ -598,8 +690,62 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function isActive(): bool
     {
-        // TODO: Implement isActive() method.
+        return $this->isActive;
     }
 
+    /**
+     * Create schedule
+     *
+     * @return RecurringSchedule
+     */
+    public function schedule(): RecurringSchedule
+    {
+        return $this;
+    }
 
+    /**
+     * Create schedule.
+     *
+     * @param RecurringSchedule|null $schedule
+     *
+     * @return string Schedule id/token
+     */
+    public function saveSchedule(RecurringSchedule $schedule = null): string
+    {
+        // TODO: Implement saveSchedule() method.
+    }
+
+    /**
+     * Remove schedule
+     *
+     * @param string $token
+     *
+     * @return bool
+     */
+    public function removeSchedule(string $token): bool
+    {
+        // TODO: Implement removeSchedule() method.
+    }
+
+    /**
+     * Get schedule by id
+     *
+     * @param string $id
+     *
+     * @return RecurringSchedule
+     */
+    public function getSchedule(string $id): RecurringSchedule
+    {
+        // TODO: Implement getSchedule() method.
+    }
+
+    /**
+     * Get list of schedules
+     *
+     * @return array|[]RecurringSchedule
+     */
+    public function getAllSchedules(): array
+    {
+        // TODO: Implement getAllSchedules() method.
+    }
 }
