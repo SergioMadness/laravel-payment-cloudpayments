@@ -1,5 +1,6 @@
 <?php namespace professionalweb\payment\drivers\cloudpayments;
 
+use CloudPayments\Manager;
 use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\interfaces\CloudPaymentProtocol;
 
@@ -9,6 +10,37 @@ use professionalweb\payment\interfaces\CloudPaymentProtocol;
  */
 class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
 {
+    private const ENDPOINT_CARD_CHARGE = '/payments/cards/charge';
+
+    private const ENDPOINT_SUBSCRIPTION_LIST = '/subscriptions/find';
+
+    private const ENDPOINT_SUBSCRIPTION = '/subscriptions/get';
+
+    private const ENDPOINT_SUBSCRIPTION_CREATE = '/subscriptions/create';
+
+    private const ENDPOINT_SUBSCRIPTION_UPDATE = '/subscriptions/update';
+
+    private const ENDPOINT_SUBSCRIPTION_CANCEL = '/subscriptions/cancel';
+
+    /** @var string */
+    private $url;
+
+    /** @var string */
+    private $publicKey;
+
+    /** @var string */
+    private $privateKey;
+
+    /** @var Manager */
+    private $cloudPaymentsService;
+
+    /** @var array */
+    private $response = [];
+
+    public function __construct(Manager $service, string $url = '', string $publicKey = '', string $privateKey = '')
+    {
+        $this->setPublicKey($publicKey)->setPrivateKey($privateKey)->setCloudPaymentsService($service)->setUrl($url);
+    }
 
     /**
      * Get payment URL
@@ -16,10 +48,22 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      * @param array $params
      *
      * @return string
+     * @throws \Exception
      */
     public function getPaymentUrl(array $params): string
     {
-        // TODO: Implement getPaymentUrl() method.
+        $result = $this->sendRequest(
+            self::ENDPOINT_CARD_CHARGE,
+            $this->prepareParams($params)
+        );
+
+        if (!$result || !$result['Success']) {
+            throw new \Exception($result['Message'] ?? '');
+        }
+
+        $this->response = $result;
+
+        return $result && isset($result['Model']['AcsUrl']) ? $result['Model']['AcsUrl'] : '';
     }
 
     /**
@@ -31,7 +75,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function prepareParams(array $params): array
     {
-        // TODO: Implement prepareParams() method.
+        return $params;
     }
 
     /**
@@ -43,7 +87,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function validate(array $params): bool
     {
-        // TODO: Implement validate() method.
+        return true;
     }
 
     /**
@@ -53,7 +97,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function getPaymentId(): string
     {
-        // TODO: Implement getPaymentId() method.
+        return $this->response['Model']['Transaction'] ?? '';
     }
 
     /**
@@ -66,7 +110,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function getNotificationResponse($requestData, $errorCode): string
     {
-        // TODO: Implement getNotificationResponse() method.
+        return json_encode(['code', $errorCode]);
     }
 
     /**
@@ -79,17 +123,28 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function getCheckResponse($requestData, $errorCode): string
     {
-        // TODO: Implement getCheckResponse() method.
+        return json_encode(['code', $errorCode]);
     }
 
     /**
      * Get list of schedules
      *
+     * @param string $accountId
+     *
      * @return array
+     * @throws \Exception
      */
-    public function getScheduleList(): array
+    public function getScheduleList(string $accountId): array
     {
-        // TODO: Implement getScheduleList() method.
+        $result = $this->sendRequest(self::ENDPOINT_SUBSCRIPTION_LIST, [
+            'accountId' => $accountId,
+        ]);
+
+        if (!$result || !$result['Success']) {
+            throw new \Exception($result['Message'] ?? '');
+        }
+
+        return $result;
     }
 
     /**
@@ -98,10 +153,19 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      * @param string $id
      *
      * @return array
+     * @throws \Exception
      */
     public function getSchedule(string $id): array
     {
-        // TODO: Implement getSchedule() method.
+        $result = $this->sendRequest(self::ENDPOINT_SUBSCRIPTION, [
+            'Id' => $id,
+        ]);
+
+        if (!$result || !$result['Success']) {
+            throw new \Exception($result['Message'] ?? '');
+        }
+
+        return $result;
     }
 
     /**
@@ -110,10 +174,17 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      * @param array $data
      *
      * @return string
+     * @throws \Exception
      */
     public function createSchedule(array $data): string
     {
-        // TODO: Implement createSchedule() method.
+        $result = $this->sendRequest(self::ENDPOINT_SUBSCRIPTION_CREATE, $data);
+
+        if (!$result || !$result['Success']) {
+            throw new \Exception($result['Message'] ?? '');
+        }
+
+        return $result['Model']['Id'];
     }
 
     /**
@@ -123,10 +194,15 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      * @param array  $data
      *
      * @return bool
+     * @throws \Exception
      */
     public function updateSchedule(string $id, array $data): bool
     {
-        // TODO: Implement updateSchedule() method.
+        $data['Id'] = $id;
+
+        $result = $this->sendRequest(self::ENDPOINT_SUBSCRIPTION_UPDATE, $data);
+
+        return $result && $result['Success'];
     }
 
     /**
@@ -138,6 +214,114 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function removeSchedule(string $id): bool
     {
-        // TODO: Implement removeSchedule() method.
+        $result = $this->sendRequest(self::ENDPOINT_SUBSCRIPTION_CANCEL, ['Id' => $id]);
+
+        return $result && $result['Success'];
+    }
+
+    /**
+     * Send request to cloudpayments
+     *
+     * @param string $endpoint
+     * @param array  $params
+     *
+     * @return array
+     */
+    protected function sendRequest(string $endpoint, array $params = []): array
+    {
+        $url = rtrim($this->getUrl(), '/') . '/' . ltrim($endpoint, '/');
+
+        $curl = curl_init($url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($curl, CURLOPT_USERPWD, sprintf('%s:%s', $this->getPublicKey(), $this->getPrivateKey()));
+        curl_setopt($curl, CURLOPT_TIMEOUT, 20);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params));
+
+        $body = curl_exec($curl);
+
+        return json_decode($body, true);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPublicKey(): string
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * @param string $publicKey
+     *
+     * @return $this
+     */
+    public function setPublicKey(string $publicKey): self
+    {
+        $this->publicKey = $publicKey;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrivateKey(): string
+    {
+        return $this->privateKey;
+    }
+
+    /**
+     * @param string $privateKey
+     *
+     * @return $this
+     */
+    public function setPrivateKey(string $privateKey): self
+    {
+        $this->privateKey = $privateKey;
+
+        return $this;
+    }
+
+    /**
+     * @return Manager
+     */
+    public function getCloudPaymentsService(): Manager
+    {
+        return $this->cloudPaymentsService;
+    }
+
+    /**
+     * @param Manager $cloudPaymentsService
+     *
+     * @return $this
+     */
+    public function setCloudPaymentsService(Manager $cloudPaymentsService): self
+    {
+        $this->cloudPaymentsService = $cloudPaymentsService;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
+
+        return $this;
     }
 }

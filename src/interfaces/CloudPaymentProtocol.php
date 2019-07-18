@@ -9,9 +9,11 @@ interface CloudPaymentProtocol
     /**
      * Get list of schedules
      *
+     * @param string $accountId
+     *
      * @return array
      */
-    public function getScheduleList(): array;
+    public function getScheduleList(string $accountId): array;
 
     /**
      * Get schedule by id
