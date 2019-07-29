@@ -3,11 +3,13 @@
 use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
 use professionalweb\payment\contracts\Form;
+use professionalweb\payment\models\Schedule;
 use professionalweb\payment\contracts\Receipt;
 use professionalweb\payment\contracts\PayService;
 use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\models\PayServiceOption;
 use professionalweb\payment\interfaces\CloudPaymentsService;
+use professionalweb\payment\interfaces\CloudPaymentProtocol;
 use professionalweb\payment\contracts\recurring\RecurringSchedule;
 use professionalweb\payment\contracts\recurring\RecurringPaymentSchedule;
 
@@ -15,7 +17,7 @@ use professionalweb\payment\contracts\recurring\RecurringPaymentSchedule;
  * CloudPayments implementation
  * @package professionalweb\payment\drivers\cloudpayments
  */
-class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringSchedule, RecurringPaymentSchedule
+class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringPaymentSchedule
 {
 
     //<editor-fold desc="Fields">
@@ -24,6 +26,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     private $transport;
 
+    /** @var CloudPaymentProtocol */
+    private $cloudPaymentsProtocol;
+
     /**
      * Notification info
      *
@@ -31,61 +36,15 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     protected $response;
 
-    /**
-     * @var string
-     */
-    private $paymentToken;
+    /** @var bool */
+    private $useWidget;
 
-    /**
-     * @var string
-     */
-    private $accountId;
-
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var string
-     */
-    private $email;
-
-    /**
-     * @var float
-     */
-    private $amount;
-
-    /**
-     * @var string
-     */
-    private $currency;
-
-    /**
-     * @var bool
-     */
-    private $needConfirmation;
-
-    /**
-     * @var string
-     */
-    private $interval;
-
-    /**
-     * @var int
-     */
-    private $period;
-
-    /**
-     * @var string
-     */
-    private $startDate;
-
-    /**
-     * @var bool
-     */
-    private $isActive;
     //</editor-fold>
+
+    public function __construct(bool $useWidget = false)
+    {
+        $this->useWidget($useWidget);
+    }
 
     /**
      * Get name of payment service
@@ -125,6 +84,10 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
                                    array $extraParams = [],
                                    Receipt $receipt = null): string
     {
+        if ($this->getUseWidget()) {
+            return $successReturnUrl;
+        }
+
         if (!isset($extraParams['checkout'], $extraParams['cardholder_name'])) {
             throw new \Exception('checkout and cardholder_name params are required');
         }
@@ -342,6 +305,26 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     }
 
     /**
+     * @param CloudPaymentProtocol $protocol
+     *
+     * @return CloudPaymentsDriver
+     */
+    public function setCloudPaymentsProtocol(CloudPaymentProtocol $protocol): self
+    {
+        $this->cloudPaymentsProtocol = $protocol;
+
+        return $this->setTransport($protocol);
+    }
+
+    /**
+     * @return CloudPaymentProtocol
+     */
+    public function getCloudPaymentsProtocol(): CloudPaymentProtocol
+    {
+        return $this->cloudPaymentsProtocol;
+    }
+
+    /**
      * Get transport
      *
      * @return PayProtocol
@@ -411,308 +394,31 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     }
 
     /**
-     * Set payment token
-     *
-     * @param string $token
-     *
-     * @return RecurringSchedule
-     */
-    public function setToken(string $token): RecurringSchedule
-    {
-        $this->paymentToken = $token;
-
-        return $this;
-    }
-
-    /**
-     * Set payment description
-     *
-     * @param string $description
-     *
-     * @return RecurringSchedule
-     */
-    public function setDescription(string $description): RecurringSchedule
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * Set user's e - mail
-     *
-     * @param string $email
-     *
-     * @return RecurringSchedule
-     */
-    public function setEmail(string $email): RecurringSchedule
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    /**
-     * Set payment amount
-     *
-     * @param float $amount
-     *
-     * @return RecurringSchedule
-     */
-    public function setAmount(float $amount): RecurringSchedule
-    {
-        $this->amount = $amount;
-
-        return $this;
-    }
-
-    /**
-     * Set payment currency
-     *
-     * @param string $currency
-     *
-     * @return RecurringSchedule
-     */
-    public function setCurrency(string $currency): RecurringSchedule
-    {
-        $this->currency = $currency;
-
-        return $this;
-    }
-
-    /**
-     * Set account id
-     *
-     * @param string $id
-     *
-     * @return RecurringSchedule
-     */
-    public function setAccountId(string $id): RecurringSchedule
-    {
-        $this->accountId = $id;
-
-        return $this;
-    }
-
-    /**
-     * Set payment need confirmation
-     *
-     * @param bool $flag
-     *
-     * @return RecurringSchedule
-     */
-    public function needConfirmation(bool $flag = true): RecurringSchedule
-    {
-        $this->needConfirmation = $flag;
-
-        return $this;
-    }
-
-    /**
-     * Set date of first payment
-     *
-     * @param string $startDate
-     *
-     * @return RecurringSchedule
-     */
-    public function setStartDate(string $startDate): RecurringSchedule
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    /**
-     * Max payment quantity
-     *
-     * @param int $qty
-     *
-     * @return RecurringSchedule
-     */
-    public function setMaxPayments(int $qty): RecurringSchedule
-    {
-        $this->paymentQty = $qty;
-
-        return $this;
-    }
-
-    /**
-     * Process payment daily
-     *
-     * @return RecurringSchedule
-     */
-    public function daily(): RecurringSchedule
-    {
-        $this->period = 1;
-        $this->interval = 'Day';
-
-        return $this;
-    }
-
-    /**
-     * Process payment weekly
-     *
-     * @return RecurringSchedule
-     */
-    public function weekly(): RecurringSchedule
-    {
-        $this->period = 1;
-        $this->interval = 'Week';
-
-        return $this;
-    }
-
-    /**
-     * Process payment every month
-     *
-     * @return RecurringSchedule
-     */
-    public function monthly(): RecurringSchedule
-    {
-        $this->period = 1;
-        $this->interval = 'Month';
-
-        return $this;
-    }
-
-    /**
-     * Process payment every year
-     *
-     * @return RecurringSchedule
-     */
-    public function yearly(): RecurringSchedule
-    {
-        $this->period = 12;
-        $this->interval = 'Month';
-
-        return $this;
-    }
-
-    /**
-     * Process payment every $days days
-     *
-     * @param int $days
-     *
-     * @return RecurringSchedule
-     */
-    public function every(int $days): RecurringSchedule
-    {
-        $this->period = $days;
-        $this->interval = 'Day';
-
-        return $this;
-    }
-
-    /**
-     * Get schedule id
-     *
-     * @return string
-     */
-    public function getId(): string
-    {
-
-    }
-
-    /**
-     * Get account id
-     *
-     * @return string
-     */
-    public function getAccountId(): string
-    {
-        return $this->accountId;
-    }
-
-    /**
-     * Get description
-     *
-     * @return string
-     */
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    /**
-     * Get email
-     *
-     * @return string
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    /**
-     * Get currency
-     *
-     * @return string
-     */
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
-
-    /**
-     * Check confirmation needed
-     *
-     * @return bool
-     */
-    public function isNeedConfirmation(): bool
-    {
-        return $this->needConfirmation;
-    }
-
-    /**
-     * Get first payment date
-     *
-     * @return string
-     */
-    public function getStartDate(): string
-    {
-        return $this->startDate;
-    }
-
-    /**
-     * Get payment interval
-     *
-     * @return string
-     */
-    public function getInterval(): string
-    {
-        return $this->period . ' ' . $this->interval;
-    }
-
-    /**
-     * Check schedule is active
-     *
-     * @return bool
-     */
-    public function isActive(): bool
-    {
-        return $this->isActive;
-    }
-
-    /**
      * Create schedule
      *
-     * @return RecurringSchedule
+     * @return RecurringSchedule|Schedule
      */
     public function schedule(): RecurringSchedule
     {
-        return $this;
+        return new Schedule();
     }
 
     /**
      * Create schedule.
      *
-     * @param RecurringSchedule|null $schedule
+     * @param RecurringSchedule $schedule
      *
      * @return string Schedule id/token
      */
-    public function saveSchedule(RecurringSchedule $schedule = null): string
+    public function saveSchedule(RecurringSchedule $schedule): string
     {
-        // TODO: Implement saveSchedule() method.
+        if (!empty($schedule->getId())) {
+            $this->getCloudPaymentsProtocol()->updateSchedule($schedule->getId(), $schedule->toArray());
+        } else {
+            $this->getCloudPaymentsProtocol()->createSchedule($schedule->toArray());
+        }
+
+        return $schedule->getId();
     }
 
     /**
@@ -724,7 +430,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function removeSchedule(string $token): bool
     {
-        // TODO: Implement removeSchedule() method.
+        return $this->getCloudPaymentsProtocol()->removeSchedule($token);
     }
 
     /**
@@ -736,16 +442,64 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getSchedule(string $id): RecurringSchedule
     {
-        // TODO: Implement getSchedule() method.
+        $data = $this->getCloudPaymentsProtocol()->getSchedule($id);
+
+        return $this->fillSchedule($data['Model']);
+    }
+
+    /**
+     * Create and fill schedule
+     *
+     * @param array $data
+     *
+     * @return RecurringSchedule
+     */
+    protected function fillSchedule(array $data): RecurringSchedule
+    {
+        return $this->schedule()
+            ->setPeriod($data['Period'], $data['Interval'])
+            ->setId($data['Id'])
+            ->setMaxPayments((int)$data['MaxPeriods'])
+            ->setAccountId($data['AccountId'])
+            ->setDescription($data['Description'])
+            ->setEmail($data['Email'])
+            ->setAmount($data['Amount'])
+            ->setCurrency($data['Currency'])
+            ->needConfirmation($data['RequireConfirmation'])
+            ->setStartDate($data['StartDateIso']);
     }
 
     /**
      * Get list of schedules
      *
+     * @param string|null $accountId
+     *
      * @return array|[]RecurringSchedule
      */
-    public function getAllSchedules(): array
+    public function getAllSchedules(string $accountId = null): array
     {
-        // TODO: Implement getAllSchedules() method.
+        return array_map(function (array $item) {
+            return $this->fillSchedule($item['Model']);
+        }, $this->getCloudPaymentsProtocol()->getScheduleList($accountId));
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseWidget(): bool
+    {
+        return $this->useWidget;
+    }
+
+    /**
+     * @param mixed $useWidget
+     *
+     * @return CloudPaymentsDriver
+     */
+    public function useWidget(bool $useWidget): self
+    {
+        $this->useWidget = $useWidget;
+
+        return $this;
     }
 }

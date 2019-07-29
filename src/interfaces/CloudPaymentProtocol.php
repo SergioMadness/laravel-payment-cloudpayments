@@ -1,10 +1,12 @@
 <?php namespace professionalweb\payment\interfaces;
 
+use professionalweb\payment\contracts\PayProtocol;
+
 /**
  * Interface for service to work with cloudpayments protocol
  * @package professionalweb\payment\interfaces
  */
-interface CloudPaymentProtocol
+interface CloudPaymentProtocol extends PayProtocol
 {
     /**
      * Get list of schedules
