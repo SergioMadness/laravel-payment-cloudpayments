@@ -112,7 +112,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function getNotificationResponse($requestData, $errorCode): string
     {
-        return json_encode(['code', $errorCode]);
+        return json_encode(['code' => $errorCode]);
     }
 
     /**
@@ -125,7 +125,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      */
     public function getCheckResponse($requestData, $errorCode): string
     {
-        return json_encode(['code', $errorCode]);
+        return json_encode(['code' => $errorCode]);
     }
 
     /**

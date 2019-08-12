@@ -207,7 +207,12 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPaymentId(): string
     {
-        return $this->getResponseParam('Model.JsonData.PaymentId', $this->getResponseParam('Data.PaymentId'));
+        $data = $this->getResponseParam('Model.JsonData', $this->getResponseParam('Data', []));
+        if (is_string($data)) {
+            $data = json_decode($data);
+        }
+
+        return $data['PaymentId'] ?? '';
     }
 
     /**
@@ -343,7 +348,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getNotificationResponse(int $errorCode = null): Response
     {
-        return response($this->getTransport()->getNotificationResponse($this->response, $errorCode));
+        return response($this->getTransport()->getNotificationResponse($this->response, $this->mapError($errorCode)));
     }
 
     /**
@@ -355,7 +360,24 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCheckResponse(int $errorCode = null): Response
     {
-        return response($this->getTransport()->getNotificationResponse($this->response, $errorCode));
+        return response($this->getTransport()->getNotificationResponse($this->response, $this->mapError($errorCode)));
+    }
+
+    /**
+     * Get specific error code
+     *
+     * @param int $error
+     *
+     * @return int
+     */
+    protected function mapError(int $error): int
+    {
+        $map = [
+            self::RESPONSE_SUCCESS => 0,
+            self::RESPONSE_ERROR   => 1,
+        ];
+
+        return $map[$error] ?? $map[self::RESPONSE_ERROR];
     }
 
     /**
