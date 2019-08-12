@@ -197,7 +197,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getOrderId(): string
     {
-        return $this->getResponseParam('Model.InvoiceId');
+        return $this->getResponseParam('Model.InvoiceId', $this->getResponseParam('InvoiceId'));
     }
 
     /**
@@ -207,7 +207,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPaymentId(): string
     {
-        return $this->getResponseParam('Model.JsonData.PaymentId');
+        return $this->getResponseParam('Model.JsonData.PaymentId', $this->getResponseParam('Data.PaymentId'));
     }
 
     /**
@@ -217,7 +217,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getStatus(): string
     {
-        return $this->getResponseParam('Model.Status');
+        return $this->getResponseParam('Model.Status', $this->getResponseParam('Status'));
     }
 
     /**
@@ -227,7 +227,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function isSuccess(): bool
     {
-        return $this->getResponseParam('Success', false);
+        return $this->getResponseParam('Success', true);
     }
 
     /**
@@ -237,7 +237,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getTransactionId(): string
     {
-        return $this->getResponseParam('Model.TransactionId');
+        return $this->getResponseParam('Model.TransactionId', $this->getResponseParam('TransactionId'));
     }
 
     /**
@@ -247,7 +247,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getAmount(): float
     {
-        return $this->getResponseParam('Model.Amount');
+        return $this->getResponseParam('Model.Amount', $this->getResponseParam('Amount'));
     }
 
     /**
@@ -257,7 +257,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getErrorCode(): string
     {
-        return $this->getResponseParam('Model.Message');
+        return $this->getResponseParam('Model.Message', '');
     }
 
     /**
@@ -277,7 +277,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPan(): string
     {
-        return $this->getResponseParam('Model.CardFirstSix') . '******' . $this->getResponseParam('Model.CardLastFour');
+        return $this->getResponseParam('Model.CardFirstSix', $this->getResponseParam('CardFirstSix')) . '******' . $this->getResponseParam('Model.CardLastFour', $this->getResponseParam('CardLastFour'));
     }
 
     /**
@@ -287,7 +287,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getDateTime(): string
     {
-        return $this->getResponseParam('Model.CreatedDateIso');
+        return $this->getResponseParam('Model.CreatedDateIso', $this->getResponseParam('CreatedDateIso'));
     }
 
     /**
