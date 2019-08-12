@@ -1,6 +1,6 @@
 <?php namespace professionalweb\payment\drivers\cloudpayments;
 
-use CloudPayments\Manager;
+//use CloudPayments\Manager;
 use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\interfaces\CloudPaymentProtocol;
 
@@ -31,15 +31,17 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
     /** @var string */
     private $privateKey;
 
-    /** @var Manager */
-    private $cloudPaymentsService;
+//    /** @var Manager */
+//    private $cloudPaymentsService;
 
     /** @var array */
     private $response = [];
 
-    public function __construct(Manager $service, string $url = '', string $publicKey = '', string $privateKey = '')
+    public function __construct(string $url = '', string $publicKey = '', string $privateKey = '')
     {
-        $this->setPublicKey($publicKey)->setPrivateKey($privateKey)->setCloudPaymentsService($service)->setUrl($url);
+        $this->setPublicKey($publicKey)->setPrivateKey($privateKey)
+//            ->setCloudPaymentsService($service)
+            ->setUrl($url);
     }
 
     /**
@@ -284,26 +286,26 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
 
         return $this;
     }
-
-    /**
-     * @return Manager
-     */
-    public function getCloudPaymentsService(): Manager
-    {
-        return $this->cloudPaymentsService;
-    }
-
-    /**
-     * @param Manager $cloudPaymentsService
-     *
-     * @return $this
-     */
-    public function setCloudPaymentsService(Manager $cloudPaymentsService): self
-    {
-        $this->cloudPaymentsService = $cloudPaymentsService;
-
-        return $this;
-    }
+//
+//    /**
+//     * @return Manager
+//     */
+//    public function getCloudPaymentsService(): Manager
+//    {
+//        return $this->cloudPaymentsService;
+//    }
+//
+//    /**
+//     * @param Manager $cloudPaymentsService
+//     *
+//     * @return $this
+//     */
+//    public function setCloudPaymentsService(Manager $cloudPaymentsService): self
+//    {
+//        $this->cloudPaymentsService = $cloudPaymentsService;
+//
+//        return $this;
+//    }
 
     /**
      * @return string

@@ -31,7 +31,7 @@ class CloudPaymentsProvider extends ServiceProvider
         $this->app->bind(CloudPaymentsService::class, function ($app) {
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setTransport(
                 new CloudPaymentsProtocol(
-                    app(Manager::class),
+//                    app(Manager::class),
                     config('payment.cloudpayments.url'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
@@ -41,7 +41,7 @@ class CloudPaymentsProvider extends ServiceProvider
         $this->app->bind(PayService::class, function ($app) {
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setTransport(
                 new CloudPaymentsProtocol(
-                    app(Manager::class),
+//                    app(Manager::class),
                     config('payment.cloudpayments.url'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
@@ -51,7 +51,7 @@ class CloudPaymentsProvider extends ServiceProvider
         $this->app->bind(CloudPaymentsDriver::class, function ($app) {
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setTransport(
                 new CloudPaymentsProtocol(
-                    app(Manager::class),
+//                    app(Manager::class),
                     config('payment.cloudpayments.url'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
@@ -61,7 +61,7 @@ class CloudPaymentsProvider extends ServiceProvider
         $this->app->bind('\professionalweb\payment\CloudPayments', function ($app) {
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setTransport(
                 new CloudPaymentsProtocol(
-                    app(Manager::class),
+//                    app(Manager::class),
                     config('payment.cloudpayments.url'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
