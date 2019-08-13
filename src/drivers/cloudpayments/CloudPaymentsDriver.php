@@ -399,7 +399,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getParam(string $name)
     {
-        return $this->getResponseParam($name);
+        return $this->getResponseParam($name, $this->getResponseParam());
     }
 
     /**
@@ -523,5 +523,15 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
         $this->useWidget = $useWidget;
 
         return $this;
+    }
+
+    /**
+     * Get payment token
+     *
+     * @return string
+     */
+    public function getRecurringPayment(): string
+    {
+        return $this->getResponseParam('Token', $this->getResponseParam('Model.Token'));
     }
 }
