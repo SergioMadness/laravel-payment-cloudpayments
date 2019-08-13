@@ -275,7 +275,7 @@ class Schedule implements RecurringSchedule
      */
     public function getId(): string
     {
-        return $this->id;
+        return $this->id ?? '';
     }
 
     /**
@@ -285,7 +285,7 @@ class Schedule implements RecurringSchedule
      */
     public function getAccountId(): string
     {
-        return $this->accountId;
+        return $this->accountId ?? '';
     }
 
     /**
@@ -295,7 +295,7 @@ class Schedule implements RecurringSchedule
      */
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->description ?? '';
     }
 
     /**
@@ -315,7 +315,7 @@ class Schedule implements RecurringSchedule
      */
     public function getCurrency(): string
     {
-        return $this->currency;
+        return $this->currency ?? '';
     }
 
     /**
@@ -325,7 +325,7 @@ class Schedule implements RecurringSchedule
      */
     public function isNeedConfirmation(): bool
     {
-        return $this->needConfirmation;
+        return $this->needConfirmation ?? false;
     }
 
     /**
@@ -335,7 +335,7 @@ class Schedule implements RecurringSchedule
      */
     public function getStartDate(): string
     {
-        return $this->startDate;
+        return $this->startDate ?? '';
     }
 
     /**
@@ -355,7 +355,7 @@ class Schedule implements RecurringSchedule
      */
     public function isActive(): bool
     {
-        return $this->isActive;
+        return $this->isActive ?? false;
     }
 
     /**
@@ -373,7 +373,7 @@ class Schedule implements RecurringSchedule
      */
     public function getPaymentToken(): string
     {
-        return $this->paymentToken;
+        return $this->paymentToken ?? '';
     }
 
     /**
@@ -381,7 +381,7 @@ class Schedule implements RecurringSchedule
      */
     public function getPeriod(): int
     {
-        return $this->period;
+        return $this->period ?? 0;
     }
 
     /**
