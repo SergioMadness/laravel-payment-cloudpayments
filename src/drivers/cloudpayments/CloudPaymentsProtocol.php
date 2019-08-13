@@ -213,6 +213,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      * @param string $id
      *
      * @return bool
+     * @throws \Exception
      */
     public function removeSchedule(string $id): bool
     {
@@ -228,6 +229,7 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
      * @param array  $params
      *
      * @return array
+     * @throws \Exception
      */
     protected function sendRequest(string $endpoint, array $params = []): array
     {
@@ -243,6 +245,11 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($params));
 
         $body = curl_exec($curl);
+
+        $curlStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($curlStatus >= 400) {
+            throw new \Exception($body);
+        }
 
         return json_decode($body, true);
     }
