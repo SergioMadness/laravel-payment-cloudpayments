@@ -399,7 +399,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getParam(string $name)
     {
-        return $this->getResponseParam($name, $this->getResponseParam());
+        return $this->getResponseParam($name);
     }
 
     /**
