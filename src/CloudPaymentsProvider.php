@@ -17,7 +17,7 @@ class CloudPaymentsProvider extends ServiceProvider
 
     public function boot(): void
     {
-        app(PaymentFacade::class)->registerDriver(CloudPaymentsService::PAYMENT_CLOUDPAYMENTS, CloudPaymentsService::class);
+        app(PaymentFacade::class)->registerDriver(CloudPaymentsService::PAYMENT_CLOUDPAYMENTS, CloudPaymentsService::class, CloudPaymentsDriver::getOptions());
     }
 
 
