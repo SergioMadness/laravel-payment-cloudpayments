@@ -407,7 +407,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      *
      * @return array
      */
-    public function getOptions(): array
+    public static function getOptions(): array
     {
         return [
             (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Public Id')->setAlias('publicId'),
