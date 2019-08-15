@@ -22,6 +22,8 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
 
     private const ENDPOINT_SUBSCRIPTION_CANCEL = '/subscriptions/cancel';
 
+    private const ENDPOINT_RECURRING = '/payments/tokens/charge';
+
     /** @var string */
     private $url;
 
@@ -293,26 +295,6 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
 
         return $this;
     }
-//
-//    /**
-//     * @return Manager
-//     */
-//    public function getCloudPaymentsService(): Manager
-//    {
-//        return $this->cloudPaymentsService;
-//    }
-//
-//    /**
-//     * @param Manager $cloudPaymentsService
-//     *
-//     * @return $this
-//     */
-//    public function setCloudPaymentsService(Manager $cloudPaymentsService): self
-//    {
-//        $this->cloudPaymentsService = $cloudPaymentsService;
-//
-//        return $this;
-//    }
 
     /**
      * @return string
@@ -332,5 +314,29 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
         $this->url = $url;
 
         return $this;
+    }
+
+    /**
+     * Payment by card token
+     *
+     * @param array $params
+     *
+     * @return array
+     * @throws \Exception
+     */
+    public function paymentByToken(array $params): array
+    {
+        $result = $this->sendRequest(
+            self::ENDPOINT_RECURRING,
+            $this->prepareParams($params)
+        );
+
+        if (!$result || !$result['Success']) {
+            throw new \Exception($result['Message'] ?? '');
+        }
+
+        $this->response = $result;
+
+        return $result && isset($result['Model']) ? $result['Model'] : [];
     }
 }

@@ -88,8 +88,8 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
             return $successReturnUrl;
         }
 
-        if (!isset($extraParams['checkout'], $extraParams['cardholder_name'])) {
-            throw new \Exception('checkout and cardholder_name params are required');
+        if (!isset($extraParams['token'], $extraParams['checkout'], $extraParams['cardholder_name'])) {
+            throw new \Exception('(checkout and cardholder_name) or token params are required');
         }
 
         $request = [
@@ -98,14 +98,21 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
             'Currency'             => $currency,
             'InvoiceId'            => $orderId,
             'Description'          => $description,
-            'AccountId'            => $this->getAccountId(),
+            'AccountId'            => $extraParams['user_id'] ?? null,
             'Name'                 => $extraParams['cardholder_name'],
             'CardCryptogramPacket' => $extraParams['checkout'],
             'IpAddress'            => $extraParams['ip'] ?? ($_SERVER['HTTP_CLIENT_IP'] ?? ''),
             'JsonData'             => array_merge($extraParams, ['PaymentId' => $paymentId]),
+            'Token'                => $extraParams['token'] ?? null,
         ];
 
-        $paymentUrl = $this->getTransport()->getPaymentUrl($request);
+        $paymentUrl = isset($extraParams['token']) ?
+            $this->getCloudPaymentsProtocol()->paymentByToken($request) :
+            $this->getTransport()->getPaymentUrl($request);
+
+        if (isset($extraParams['token'])) {
+            return $successReturnUrl;
+        }
 
         return $paymentUrl;
     }

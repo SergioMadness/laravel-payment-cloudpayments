@@ -53,4 +53,13 @@ interface CloudPaymentProtocol extends PayProtocol
      * @return bool
      */
     public function removeSchedule(string $id): bool;
+
+    /**
+     * Payment by card token
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    public function paymentByToken(array $data): array;
 }
