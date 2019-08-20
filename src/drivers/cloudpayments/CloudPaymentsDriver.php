@@ -417,7 +417,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     public static function getOptions(): array
     {
         return [
-            (new PayServiceOption())->setType(PayServiceOption::TYPE_BOOL)->setLabel('Is widget')->setAlias('is_widget'),
+            (new PayServiceOption())->setType(PayServiceOption::TYPE_BOOL)->setLabel('Is widget')->setAlias('use_widget'),
             (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Public Id')->setAlias('publicKey'),
             (new PayServiceOption())->setType(PayServiceOption::TYPE_STRING)->setLabel('Secret key')->setAlias('secretKey'),
         ];
