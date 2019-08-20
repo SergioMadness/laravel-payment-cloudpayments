@@ -1,5 +1,5 @@
 {
-  "name": "professionalweb/laravel-payment-cloudpayments",
+  "name": "professionalweb/payment-laravel-cloudpayments",
   "description": "Driver for cloudpayments.ru",
   "homepage": "http://web-development.pw/",
   "keywords": [
