@@ -355,7 +355,11 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getNotificationResponse(int $errorCode = null): Response
     {
-        return response($this->getTransport()->getNotificationResponse($this->response, $this->mapError($errorCode)));
+        return response(
+            $this->getTransport()->getNotificationResponse($this->response, $this->mapError($errorCode)),
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/json']
+        );
     }
 
     /**
@@ -367,7 +371,11 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCheckResponse(int $errorCode = null): Response
     {
-        return response($this->getTransport()->getNotificationResponse($this->response, $this->mapError($errorCode)));
+        return response(
+            $this->getTransport()->getNotificationResponse($this->response, $this->mapError($errorCode)),
+            Response::HTTP_OK,
+            ['Content-Type' => 'application/json']
+        );
     }
 
     /**
