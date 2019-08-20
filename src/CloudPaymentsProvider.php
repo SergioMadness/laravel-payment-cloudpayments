@@ -32,7 +32,7 @@ class CloudPaymentsProvider extends ServiceProvider
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setCloudPaymentsProtocol(
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
-                    config('payment.cloudpayments.url'),
+                    config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
                 )
@@ -42,7 +42,7 @@ class CloudPaymentsProvider extends ServiceProvider
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setCloudPaymentsProtocol(
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
-                    config('payment.cloudpayments.url'),
+                    config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
                 )
@@ -52,7 +52,7 @@ class CloudPaymentsProvider extends ServiceProvider
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setCloudPaymentsProtocol(
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
-                    config('payment.cloudpayments.url'),
+                    config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
                 )
@@ -62,7 +62,7 @@ class CloudPaymentsProvider extends ServiceProvider
             return (new CloudPaymentsDriver(config('payment.cloudpayments.use_widget', false)))->setCloudPaymentsProtocol(
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
-                    config('payment.cloudpayments.url'),
+                    config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
                     config('payment.cloudpayments.publicKey'),
                     config('payment.cloudpayments.secretKey')
                 )
