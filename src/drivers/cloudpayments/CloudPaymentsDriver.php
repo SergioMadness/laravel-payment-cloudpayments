@@ -3,6 +3,7 @@
 use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
 use professionalweb\payment\contracts\Form;
+use professionalweb\payment\contracts\recurring\RecurringPayment;
 use professionalweb\payment\models\Schedule;
 use professionalweb\payment\contracts\Receipt;
 use professionalweb\payment\contracts\PayService;
@@ -17,7 +18,7 @@ use professionalweb\payment\contracts\recurring\RecurringPaymentSchedule;
  * CloudPayments implementation
  * @package professionalweb\payment\drivers\cloudpayments
  */
-class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringPaymentSchedule
+class CloudPaymentsDriver implements PayService, CloudPaymentsService, RecurringPaymentSchedule, RecurringPayment
 {
 
     //<editor-fold desc="Fields">
@@ -549,5 +550,56 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     public function getRecurringPayment(): string
     {
         return $this->getResponseParam('Token', $this->getResponseParam('Model.Token'));
+    }
+
+    /**
+     * Initialize recurring payment
+     *
+     * @param string $token
+     * @param string $accountId
+     * @param string $paymentId
+     * @param float  $amount
+     * @param string $description
+     * @param string $currency
+     * @param array  $extraParams
+     *
+     * @return bool
+     */
+    public function initPayment(string $token, string $accountId, string $paymentId, float $amount, string $description, string $currency = PayService::CURRENCY_RUR_ISO, array $extraParams = []): bool
+    {
+        $this->getCloudPaymentsProtocol()->paymentByToken([
+            'Amount'      => $amount,
+            'Currency'    => $currency,
+            'Token'       => $token,
+            'AccountId'   => $accountId,
+            'Description' => $description,
+            'InvoiceId'   => $paymentId,
+            'Email'       => $extraParams['email'] ?? null,
+            'JsonData'    => array_merge($extraParams, [
+                'PaymentId' => $paymentId,
+            ]),
+        ]);
+    }
+
+    /**
+     * Remember payment fo recurring payments
+     *
+     * @return RecurringPayment
+     */
+    public function makeRecurring(): RecurringPayment
+    {
+        // TODO: Implement makeRecurring() method.
+    }
+
+    /**
+     * Set user id payment will be assigned
+     *
+     * @param string $id
+     *
+     * @return RecurringPayment
+     */
+    public function setUserId(string $id): RecurringPayment
+    {
+        // TODO: Implement setUserId() method.
     }
 }
