@@ -570,7 +570,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function initPayment(string $token, string $paymentId, float $amount, string $description, string $currency = PayService::CURRENCY_RUR_ISO, array $extraParams = []): bool
     {
-        $result = $this->getCloudPaymentsProtocol()->paymentByToken([
+        $this->getCloudPaymentsProtocol()->paymentByToken([
             'Amount'      => $amount,
             'Currency'    => $currency,
             'Token'       => $token,
@@ -583,7 +583,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
             ]),
         ]);
 
-        return $result['Success'];
+        return true;
     }
 
     /**
