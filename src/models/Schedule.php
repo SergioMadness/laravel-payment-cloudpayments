@@ -392,16 +392,16 @@ class Schedule implements RecurringSchedule
     public function toArray()
     {
         return [
-            'token'               => $this->getPaymentToken(),
-            'accountId'           => $this->getAccountId(),
-            'description'         => $this->getDescription(),
-            'email'               => $this->getEmail(),
-            'amount'              => $this->getAmount(),
-            'currency'            => $this->getCurrency(),
-            'requireConfirmation' => $this->isNeedConfirmation(),
-            'startDate'           => $this->getStartDate(),
-            'interval'            => $this->getInterval(),
-            'period'              => $this->getPeriod(),
+            'Token'               => $this->getPaymentToken(),
+            'AccountId'           => $this->getAccountId(),
+            'Description'         => $this->getDescription(),
+            'Email'               => $this->getEmail(),
+            'Amount'              => $this->getAmount(),
+            'Currency'            => $this->getCurrency(),
+            'RequireConfirmation' => $this->isNeedConfirmation(),
+            'StartDate'           => $this->getStartDate(),
+            'Interval'            => $this->getInterval(),
+            'Period'              => $this->getPeriod(),
         ];
     }
 }
