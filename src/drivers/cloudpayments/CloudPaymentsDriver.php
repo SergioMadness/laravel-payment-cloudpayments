@@ -40,6 +40,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     /** @var bool */
     private $useWidget;
 
+    /** @var string */
+    private $accountId;
+
     //</editor-fold>
 
     public function __construct(bool $useWidget = false)
@@ -565,13 +568,13 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      *
      * @return bool
      */
-    public function initPayment(string $token, string $accountId, string $paymentId, float $amount, string $description, string $currency = PayService::CURRENCY_RUR_ISO, array $extraParams = []): bool
+    public function initPayment(string $token, string $paymentId, float $amount, string $description, string $currency = PayService::CURRENCY_RUR_ISO, array $extraParams = []): bool
     {
         $this->getCloudPaymentsProtocol()->paymentByToken([
             'Amount'      => $amount,
             'Currency'    => $currency,
             'Token'       => $token,
-            'AccountId'   => $accountId,
+            'AccountId'   => $this->getUserId(),
             'Description' => $description,
             'InvoiceId'   => $paymentId,
             'Email'       => $extraParams['email'] ?? null,
@@ -588,7 +591,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function makeRecurring(): RecurringPayment
     {
-        // TODO: Implement makeRecurring() method.
+        return $this;
     }
 
     /**
@@ -600,6 +603,18 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function setUserId(string $id): RecurringPayment
     {
-        // TODO: Implement setUserId() method.
+        $this->accountId = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get user id
+     *
+     * @return string
+     */
+    public function getUserId(): string
+    {
+        return (string)$this->accountId;
     }
 }
