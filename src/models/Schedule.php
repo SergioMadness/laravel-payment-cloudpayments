@@ -400,7 +400,7 @@ class Schedule implements RecurringSchedule
             'Currency'            => $this->getCurrency(),
             'RequireConfirmation' => $this->isNeedConfirmation(),
             'StartDate'           => $this->getStartDate(),
-            'Interval'            => $this->getInterval(),
+            'Interval'            => $this->interval,
             'Period'              => $this->getPeriod(),
         ];
     }
