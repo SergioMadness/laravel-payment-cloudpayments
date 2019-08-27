@@ -88,11 +88,11 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
                                    array $extraParams = [],
                                    Receipt $receipt = null): string
     {
-        if ($this->getUseWidget()) {
+        if (!isset($extraParams['token']) && $this->getUseWidget()) {
             return $successReturnUrl;
         }
 
-        if (!isset($extraParams['token'], $extraParams['checkout'], $extraParams['cardholder_name'])) {
+        if (!isset($extraParams['token']) && !isset($extraParams['checkout'], $extraParams['cardholder_name'])) {
             throw new \Exception('(checkout and cardholder_name) or token params are required');
         }
 
@@ -103,9 +103,9 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
             'InvoiceId'            => $orderId,
             'Description'          => $description,
             'AccountId'            => $extraParams['user_id'] ?? null,
-            'Name'                 => $extraParams['cardholder_name'],
-            'CardCryptogramPacket' => $extraParams['checkout'],
-            'IpAddress'            => $extraParams['ip'] ?? ($_SERVER['HTTP_CLIENT_IP'] ?? ''),
+            'Name'                 => $extraParams['cardholder_name'] ?? null,
+            'CardCryptogramPacket' => $extraParams['checkout'] ?? null,
+            'IpAddress'            => $extraParams['ip'] ?? ($_SERVER['HTTP_CLIENT_IP'] ?? null),
             'JsonData'             => array_merge($extraParams, ['PaymentId' => $paymentId]),
             'Token'                => $extraParams['token'] ?? null,
         ];
