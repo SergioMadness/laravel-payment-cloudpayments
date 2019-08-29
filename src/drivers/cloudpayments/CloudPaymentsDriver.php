@@ -220,7 +220,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     {
         $data = $this->getResponseParam('Model.JsonData', $this->getResponseParam('Data', []));
         if (is_string($data)) {
-            $data = json_decode($data);
+            $data = json_decode($data, true);
         }
 
         return $data['PaymentId'] ?? '';
