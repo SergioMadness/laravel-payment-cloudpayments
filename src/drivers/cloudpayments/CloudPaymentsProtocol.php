@@ -1,6 +1,7 @@
 <?php namespace professionalweb\payment\drivers\cloudpayments;
 
 //use CloudPayments\Manager;
+use Illuminate\Support\Arr;
 use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\interfaces\CloudPaymentProtocol;
 
@@ -332,7 +333,8 @@ class CloudPaymentsProtocol implements PayProtocol, CloudPaymentProtocol
         );
 
         if (!$result || !$result['Success']) {
-            throw new \Exception($result['Message'] ?? '');
+            $message = Arr::get($result, 'Message') ?? Arr::get($result, 'Model.CardHolderMessage');
+            throw new \Exception($message);
         }
 
         $this->response = $result;
