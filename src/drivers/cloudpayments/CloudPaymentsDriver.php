@@ -561,6 +561,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      * @param string $token
      * @param string $accountId
      * @param string $paymentId
+     * @param string $orderId
      * @param float  $amount
      * @param string $description
      * @param string $currency
@@ -568,7 +569,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      *
      * @return bool
      */
-    public function initPayment(string $token, string $paymentId, float $amount, string $description, string $currency = PayService::CURRENCY_RUR_ISO, array $extraParams = []): bool
+    public function initPayment(string $token, string $orderId, string $paymentId, float $amount, string $description, string $currency = PayService::CURRENCY_RUR_ISO, array $extraParams = []): bool
     {
         $this->getCloudPaymentsProtocol()->paymentByToken([
             'Amount'      => $amount,
@@ -576,6 +577,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
             'Token'       => $token,
             'AccountId'   => $this->getUserId(),
             'Description' => $description,
+            'InvoiceId'   => $orderId,
             'Email'       => $extraParams['email'] ?? null,
             'JsonData'    => array_merge($extraParams, [
                 'PaymentId' => $paymentId,
