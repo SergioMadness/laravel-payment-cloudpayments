@@ -576,7 +576,6 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
             'Token'       => $token,
             'AccountId'   => $this->getUserId(),
             'Description' => $description,
-            'InvoiceId'   => $paymentId,
             'Email'       => $extraParams['email'] ?? null,
             'JsonData'    => array_merge($extraParams, [
                 'PaymentId' => $paymentId,
