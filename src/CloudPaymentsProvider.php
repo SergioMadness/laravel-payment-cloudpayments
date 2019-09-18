@@ -33,8 +33,8 @@ class CloudPaymentsProvider extends ServiceProvider
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
                     config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
-                    config('payment.cloudpayments.publicKey'),
-                    config('payment.cloudpayments.secretKey')
+                    config('payment.cloudpayments.publicKey', ''),
+                    config('payment.cloudpayments.secretKey', '')
                 )
             );
         });
@@ -43,8 +43,8 @@ class CloudPaymentsProvider extends ServiceProvider
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
                     config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
-                    config('payment.cloudpayments.publicKey'),
-                    config('payment.cloudpayments.secretKey')
+                    config('payment.cloudpayments.publicKey', ''),
+                    config('payment.cloudpayments.secretKey', '')
                 )
             );
         });
@@ -53,8 +53,8 @@ class CloudPaymentsProvider extends ServiceProvider
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
                     config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
-                    config('payment.cloudpayments.publicKey'),
-                    config('payment.cloudpayments.secretKey')
+                    config('payment.cloudpayments.publicKey', ''),
+                    config('payment.cloudpayments.secretKey', '')
                 )
             );
         });
@@ -63,8 +63,8 @@ class CloudPaymentsProvider extends ServiceProvider
                 new CloudPaymentsProtocol(
 //                    app(Manager::class),
                     config('payment.cloudpayments.url', 'https://api.cloudpayments.ru'),
-                    config('payment.cloudpayments.publicKey'),
-                    config('payment.cloudpayments.secretKey')
+                    config('payment.cloudpayments.publicKey', ''),
+                    config('payment.cloudpayments.secretKey', '')
                 )
             );
         });
