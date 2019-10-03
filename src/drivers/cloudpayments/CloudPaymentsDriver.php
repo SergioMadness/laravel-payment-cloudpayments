@@ -129,7 +129,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function needForm(): bool
     {
-        return false;
+        return $this->getUseWidget();
     }
 
     /**
