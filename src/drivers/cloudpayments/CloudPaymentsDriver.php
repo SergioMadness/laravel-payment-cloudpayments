@@ -8,6 +8,7 @@ use professionalweb\payment\contracts\Receipt;
 use professionalweb\payment\contracts\PayService;
 use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\models\PayServiceOption;
+use professionalweb\payment\contracts\Form as IForm;
 use professionalweb\payment\interfaces\CloudPaymentsService;
 use professionalweb\payment\interfaces\CloudPaymentProtocol;
 use professionalweb\payment\contracts\recurring\RecurringPayment;
@@ -157,7 +158,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
                                    string $failReturnUrl = '',
                                    string $description = '',
                                    array $extraParams = [],
-                                   Receipt $receipt = null): Form
+                                   Receipt $receipt = null): IForm
     {
         return new Form();
     }
