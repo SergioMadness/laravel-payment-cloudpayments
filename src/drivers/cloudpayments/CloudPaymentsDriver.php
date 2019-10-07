@@ -2,8 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Http\Response;
-use professionalweb\payment\contracts\Form;
-use professionalweb\payment\contracts\recurring\RecurringPayment;
+use professionalweb\payment\Form;
 use professionalweb\payment\models\Schedule;
 use professionalweb\payment\contracts\Receipt;
 use professionalweb\payment\contracts\PayService;
@@ -11,6 +10,7 @@ use professionalweb\payment\contracts\PayProtocol;
 use professionalweb\payment\models\PayServiceOption;
 use professionalweb\payment\interfaces\CloudPaymentsService;
 use professionalweb\payment\interfaces\CloudPaymentProtocol;
+use professionalweb\payment\contracts\recurring\RecurringPayment;
 use professionalweb\payment\contracts\recurring\RecurringSchedule;
 use professionalweb\payment\contracts\recurring\RecurringPaymentSchedule;
 
