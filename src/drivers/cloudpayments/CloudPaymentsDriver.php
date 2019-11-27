@@ -393,8 +393,11 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     protected function mapError(int $error): int
     {
         $map = [
-            self::RESPONSE_SUCCESS => 0,
-            self::RESPONSE_ERROR   => 1,
+            self::RESPONSE_SUCCESS             => 0,
+            self::RESPONSE_ERROR               => 13,
+            self::RESPONSE_ERROR_WRONG_ORDER   => 10,
+            self::RESPONSE_ERROR_WRONG_PAYMENT => 10,
+            self::RESPONSE_ERROR_WRONG_AMOUNT  => 12,
         ];
 
         return $map[$error] ?? $map[self::RESPONSE_ERROR];
