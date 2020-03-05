@@ -692,6 +692,6 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPaymentType(): string
     {
-        return $this->getResponseParam('Model.PaymentMethod', $this->getResponseParam('PaymentMethod', ''));
+        return $this->getResponseParam('Model.PaymentMethod', $this->getResponseParam('Email', ''));
     }
 }

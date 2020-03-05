@@ -28,7 +28,7 @@
   },
   "require": {
     "illuminate/support": "5.*",
-    "professionalweb/payment-laravel": "3.1.x-dev",
+    "professionalweb/payment-laravel": "dev-develop",
     "troytft/cloud-payments-client": "^0.1.0"
   },
   "require-dev": {
