@@ -1,6 +1,5 @@
 <?php namespace professionalweb\payment;
 
-use CloudPayments\Manager;
 use Illuminate\Support\ServiceProvider;
 use professionalweb\payment\contracts\PayService;
 use professionalweb\payment\contracts\PaymentFacade;

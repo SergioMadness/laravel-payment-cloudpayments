@@ -624,4 +624,74 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
     {
         return (string)$this->accountId;
     }
+
+    /**
+     * Get payment currency
+     *
+     * @return string
+     */
+    public function getCurrency(): string
+    {
+        return $this->getResponseParam('Model.Currency', $this->getResponseParam('Currency', ''));
+    }
+
+    /**
+     * Get card type. Visa, MC etc
+     *
+     * @return string
+     */
+    public function getCardType(): string
+    {
+        return $this->getResponseParam('Model.CardType', $this->getResponseParam('CardType', ''));
+    }
+
+    /**
+     * Get card expiration date
+     *
+     * @return string
+     */
+    public function getCardExpDate(): string
+    {
+        return $this->getResponseParam('Model.CardExpDate', $this->getResponseParam('CardExpDate', ''));
+    }
+
+    /**
+     * Get cardholder name
+     *
+     * @return string
+     */
+    public function getCardUserName(): string
+    {
+        return $this->getResponseParam('Model.Name', $this->getResponseParam('Name', ''));
+    }
+
+    /**
+     * Get card issuer
+     *
+     * @return string
+     */
+    public function getIssuer(): string
+    {
+        return $this->getResponseParam('Model.Issuer', $this->getResponseParam('Issuer', ''));
+    }
+
+    /**
+     * Get e-mail
+     *
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->getResponseParam('Model.Email', $this->getResponseParam('Email', ''));
+    }
+
+    /**
+     * Get payment type. "GooglePay" for example
+     *
+     * @return string
+     */
+    public function getPaymentType(): string
+    {
+        return $this->getResponseParam('Model.PaymentMethod', $this->getResponseParam('PaymentMethod', ''));
+    }
 }
