@@ -7,8 +7,8 @@ use professionalweb\payment\models\Schedule;
 use professionalweb\payment\contracts\Receipt;
 use professionalweb\payment\contracts\PayService;
 use professionalweb\payment\contracts\PayProtocol;
-use professionalweb\payment\models\PayServiceOption;
 use professionalweb\payment\contracts\Form as IForm;
+use professionalweb\payment\models\PayServiceOption;
 use professionalweb\payment\interfaces\CloudPaymentsService;
 use professionalweb\payment\interfaces\CloudPaymentProtocol;
 use professionalweb\payment\contracts\recurring\RecurringPayment;
@@ -632,7 +632,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCurrency(): string
     {
-        return $this->getResponseParam('Model.Currency', $this->getResponseParam('Currency', ''));
+        return $this->getResponseParam('Model.Currency', $this->getResponseParam('Currency', '')) ?? '';
     }
 
     /**
@@ -642,7 +642,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCardType(): string
     {
-        return $this->getResponseParam('Model.CardType', $this->getResponseParam('CardType', ''));
+        return $this->getResponseParam('Model.CardType', $this->getResponseParam('CardType', '')) ?? '';
     }
 
     /**
@@ -652,7 +652,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCardExpDate(): string
     {
-        return $this->getResponseParam('Model.CardExpDate', $this->getResponseParam('CardExpDate', ''));
+        return $this->getResponseParam('Model.CardExpDate', $this->getResponseParam('CardExpDate', '')) ?? '';
     }
 
     /**
@@ -662,7 +662,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getCardUserName(): string
     {
-        return $this->getResponseParam('Model.Name', $this->getResponseParam('Name', ''));
+        return $this->getResponseParam('Model.Name', $this->getResponseParam('Name', '')) ?? '';
     }
 
     /**
@@ -672,7 +672,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getIssuer(): string
     {
-        return $this->getResponseParam('Model.Issuer', $this->getResponseParam('Issuer', ''));
+        return $this->getResponseParam('Model.Issuer', $this->getResponseParam('Issuer', '')) ?? '';
     }
 
     /**
@@ -682,7 +682,7 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getEmail(): string
     {
-        return $this->getResponseParam('Model.Email', $this->getResponseParam('Email', ''));
+        return $this->getResponseParam('Model.Email', $this->getResponseParam('Email', '')) ?? '';
     }
 
     /**
@@ -692,6 +692,6 @@ class CloudPaymentsDriver implements PayService, CloudPaymentsService, Recurring
      */
     public function getPaymentType(): string
     {
-        return $this->getResponseParam('Model.PaymentMethod', $this->getResponseParam('Email', ''));
+        return $this->getResponseParam('Model.PaymentMethod', $this->getResponseParam('Email', '')) ?? '';
     }
 }
